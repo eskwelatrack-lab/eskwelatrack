@@ -1,0 +1,139 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- helpers ----------
+    function signedIn()   { return request.auth != null; }
+    function profilePath(){ return /databases/$(database)/documents/users/$(request.auth.uid); }
+    function hasProfile() { return signedIn() && exists(profilePath()); }
+    function isAdmin()    { return hasProfile() && get(profilePath()).data.role == 'admin'; }
+    function isStaff()    { return hasProfile() && get(profilePath()).data.role in ['admin', 'teacher']; }
+
+    // Today's date in Philippine time (UTC+8), "YYYY-MM-DD", computed from the SERVER clock.
+    function pad(n) { return (n < 10 ? '0' : '') + string(n); }
+    function manilaToday() {
+      let t = request.time + duration.value(8, 'h');
+      return string(t.year()) + '-' + pad(t.month()) + '-' + pad(t.day());
+    }
+    // Current minute of the day in Philippine time (server clock), 0..1439.
+    function minuteNow() {
+      let t = request.time + duration.value(8, 'h');
+      return t.hours() * 60 + t.minutes();
+    }
+    // Scanning schedule saved by the admin in settings/system (minutes after midnight); defaults if never saved.
+    function settingsPath() { return /databases/$(database)/documents/settings/system; }
+    function sched(key, dflt) { return exists(settingsPath()) ? get(settingsPath()).data.get(key, dflt) : dflt; }
+    function win(a, b, da, db) { return minuteNow() >= sched(a, da) && minuteNow() < sched(b, db); }
+    function amInOpen()  { return win('amInStart',  'amInEnd',  300, 600); }
+    function amOutOpen() { return win('amOutStart', 'amOutEnd', 720, 780); }
+    function pmInOpen()  { return win('pmInStart',  'pmInEnd',  780, 900); }
+    function pmOutOpen() { return win('pmOutStart', 'pmOutEnd', 960, 1080); }
+
+    // One scan entry. IN scans carry `late`, which must match the server clock vs. the on-time limit.
+    function inEntry(e, lateKey, lateDefault) {
+      return e.keys().hasOnly(['at', 'by', 'late']) && e.keys().hasAll(['at', 'by', 'late'])
+          && e.at == request.time && e.by == request.auth.uid
+          && e.late is bool && e.late == (minuteNow() > sched(lateKey, lateDefault));
+    }
+    function outEntry(e) {
+      return e.keys().hasOnly(['at', 'by']) && e.keys().hasAll(['at', 'by'])
+          && e.at == request.time && e.by == request.auth.uid;
+    }
+    // d = the new document. True if it holds a valid scan whose window is open right now.
+    function slotOk(d) {
+      return ('amIn'  in d && amInOpen()  && inEntry(d.amIn, 'amInLate', 480))
+          || ('amOut' in d && amOutOpen() && outEntry(d.amOut))
+          || ('pmIn'  in d && pmInOpen()  && inEntry(d.pmIn, 'pmInLate', 795))
+          || ('pmOut' in d && pmOutOpen() && outEntry(d.pmOut));
+    }
+    // old = existing document, d = new document. True if exactly a NEW valid scan was added.
+    function slotAdded(old, d) {
+      return (!('amIn'  in old) && 'amIn'  in d && amInOpen()  && inEntry(d.amIn, 'amInLate', 480))
+          || (!('amOut' in old) && 'amOut' in d && amOutOpen() && outEntry(d.amOut))
+          || (!('pmIn'  in old) && 'pmIn'  in d && pmInOpen()  && inEntry(d.pmIn, 'pmInLate', 795))
+          || (!('pmOut' in old) && 'pmOut' in d && pmOutOpen() && outEntry(d.pmOut));
+    }
+
+    // ---------- staff accounts ----------
+    match /users/{uid} {
+      allow read:   if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow create: if isAdmin()
+                    && request.resource.data.role in ['admin', 'teacher']
+                    && request.resource.data.name is string
+                    && request.resource.data.email is string;
+      allow update: if isAdmin()
+                    && request.resource.data.role in ['admin', 'teacher']
+                    && (uid != request.auth.uid || request.resource.data.role == 'admin'); // can't demote yourself
+      allow delete: if isAdmin() && uid != request.auth.uid;                                 // can't remove yourself
+    }
+
+    // ---------- shared customization ----------
+    match /settings/{docId} {
+      allow read:  if isStaff();
+      allow write: if isAdmin();
+    }
+
+    // ---------- students (name/LRN/section only: teachers can read) ----------
+    function validStudent(d) {
+      return d.keys().hasOnly(['name', 'section', 'status', 'registeredDate', 'createdAt'])
+          && d.keys().hasAll(['name', 'section', 'status', 'registeredDate'])
+          && d.name is string && d.name.size() > 0 && d.name.size() <= 120
+          && d.section is string && d.section.size() > 0 && d.section.size() <= 60
+          && d.status in ['Active', 'Inactive']
+          && d.registeredDate is string && d.registeredDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+    }
+    match /students/{lrn} {
+      allow read:   if isStaff();
+      allow create: if isAdmin() && lrn.matches('^[0-9]{12}$') && validStudent(request.resource.data);
+      allow update: if isAdmin() && validStudent(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // ---------- private student details (address, contact, guardian, photo): ADMIN ONLY ----------
+    function validDetails(d) {
+      return d.keys().hasOnly(['address', 'contact', 'guardian', 'adviser', 'principal', 'schoolYear', 'photo'])
+          && (!('photo' in d) || (d.photo is string && d.photo.size() < 250000));
+    }
+    match /studentDetails/{lrn} {
+      allow read:  if isAdmin();
+      allow write: if isAdmin() && validDetails(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // ---------- QR secrets ----------
+    // Staff may GET a token only if they already hold it (i.e. they scanned it). Only admins can LIST/create/delete.
+    match /qrTokens/{token} {
+      allow get:    if isStaff();
+      allow list:   if isAdmin();
+      allow create: if isAdmin() && token.matches('^[A-Za-z0-9_-]{32}$')
+                    && request.resource.data.keys().hasOnly(['studentId', 'createdAt'])
+                    && request.resource.data.studentId is string;
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // ---------- attendance ----------
+    // One document per student per day, holding up to 4 scans: amIn, amOut, pmIn, pmOut.
+    //  * The first scan of the day CREATES the document with just that scan.
+    //  * Each later scan UPDATES it by adding one new scan; an existing scan can never be changed.
+    // The date, the open window, the timestamps and the Late flag are all checked against the SERVER clock
+    // (Philippine time), so a wrong device clock cannot back-date a record or scan outside the allowed hours.
+    match /attendance/{recordId} {
+      allow read: if isStaff();
+      allow create: if isStaff()
+        && request.resource.data.keys().hasOnly(['studentId', 'name', 'section', 'date', 'amIn', 'amOut', 'pmIn', 'pmOut'])
+        && request.resource.data.keys().size() == 5
+        && request.resource.data.date == manilaToday()
+        && recordId == request.resource.data.date + '_' + request.resource.data.studentId
+        && slotOk(request.resource.data)
+        && get(/databases/$(database)/documents/students/$(request.resource.data.studentId)).data.status == 'Active'
+        && request.resource.data.name == get(/databases/$(database)/documents/students/$(request.resource.data.studentId)).data.name
+        && request.resource.data.section == get(/databases/$(database)/documents/students/$(request.resource.data.studentId)).data.section;
+      allow update: if isStaff()
+        && resource.data.date == manilaToday()
+        && request.resource.data.diff(resource.data).affectedKeys().size() == 1
+        && slotAdded(resource.data, request.resource.data);
+      allow delete: if isAdmin();
+    }
+  }
+}
