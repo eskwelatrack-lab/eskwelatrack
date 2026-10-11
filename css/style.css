@@ -390,3 +390,44 @@ tr.grp td{background:#f7e9ec;color:#6f1025;font-weight:900;letter-spacing:.3px}
 @media(max-width:900px){.id-preview{grid-template-columns:1fr}}
 @media(max-width:520px){.id-back-body{grid-template-columns:1fr}}
 @media print{.school-id{min-height:420px}.id-qr-box #qrcode{padding:4px}}
+
+
+/* ===== Student ID: standard CR80 portrait card (54 x 85.6 mm), same layout as the school's printed ID ===== */
+/* Everything inside is sized in cqw (1% of the card width), so the card scales perfectly from screen to print. */
+.id-preview{display:flex!important;flex-wrap:wrap;gap:22px;justify-content:center;align-items:flex-start}
+.id2{position:relative;box-sizing:border-box;container-type:inline-size;flex:none;width:324px;aspect-ratio:54/85.6;background:#fff;border-radius:3.5%/2.2%;overflow:hidden;box-shadow:0 8px 22px rgba(0,0,0,.18);font-family:Arial,Helvetica,sans-serif;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.id2 *{box-sizing:border-box}
+.id2>*{position:absolute}
+.id2-top{left:0;right:0;top:0;height:9cqw;background:linear-gradient(104deg,#9c1226 0 58%,#fff 58% 61%,#c1283c 61% 100%)}
+.id2-bottom{left:0;right:0;bottom:0;height:13cqw;background:linear-gradient(76deg,#9c1226 0 40%,#fff 40% 43%,#c1283c 43% 100%)}
+.id2-deped{right:4cqw;top:3.5cqw;width:24cqw;height:auto}
+.id2-head{left:4cqw;top:11cqw;width:80cqw;font-size:3.5cqw;line-height:1.3}
+.id2-school{font-weight:900;font-size:3.25cqw;white-space:nowrap}
+.id2-photo{left:4cqw;top:29cqw;width:44cqw;height:47cqw;border:.5cqw solid #111;background:#f3eeee;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:4cqw;color:#8b6a70;text-align:center}
+.id2-photo img{width:100%;height:100%;object-fit:cover}
+.id2-seal{left:52cqw;top:34cqw;width:44cqw;height:44cqw;border-radius:50%;object-fit:cover;background:#fff}
+.id2-namebar{left:0;right:0;top:80cqw;height:16cqw;background:#a8162b;color:#fff;text-align:center}
+.id2-namebar>*{position:absolute}
+.id2-name{left:3cqw;right:3cqw;top:2.4cqw;font-size:8.5cqw;font-weight:900;text-transform:uppercase;white-space:nowrap;overflow:hidden;line-height:1.15}
+.id2-tag{left:50%;bottom:-.6cqw;transform:translateX(-50%) skewX(-18deg);background:#fff;color:#111;font-style:italic;font-weight:900;font-size:3.6cqw;padding:.5cqw 6cqw;line-height:1.2;white-space:nowrap}
+.id2-box{left:5cqw;width:56cqw;height:12cqw;border-radius:2cqw;overflow:hidden;background:linear-gradient(#fbe1ea,#f3b8c9);box-shadow:0 .5cqw 1cqw rgba(0,0,0,.25)}
+.id2-box .v{height:8cqw;display:flex;align-items:center;justify-content:center;font-size:6.2cqw;white-space:nowrap;overflow:hidden;padding:0 2cqw}
+.id2-box .l{height:4cqw;background:linear-gradient(#b01c33,#8f1226);color:#fff;font-size:3.1cqw;font-weight:800;font-style:italic;text-align:center;line-height:4cqw;white-space:nowrap}
+.id2-lrn{top:100cqw}.id2-grade{top:114cqw}
+.id2-sig{left:50cqw;top:116cqw;width:30cqw;height:14cqw;object-fit:contain}
+.id2-principal{left:34cqw;width:64cqw;top:130cqw;text-align:center}
+.id2-principal b{display:block;font-size:4.6cqw;font-weight:900;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.id2-principal span{font-size:4cqw}
+/* back */
+.id2-rule{left:7cqw;right:7cqw;top:13cqw;margin:0;font-size:4.3cqw;line-height:1.42;text-align:justify}
+.id2-emerg{left:0;right:0;top:50cqw;height:7.5cqw;background:#a8162b;color:#fff;font-weight:800;font-size:3.4cqw;text-align:center;line-height:7.5cqw}
+.id2-fields{left:7cqw;right:7cqw;top:60cqw;display:flex;flex-direction:column;gap:2.5cqw}
+.id2-fields small{display:block;font-size:3.7cqw}
+.id2-fields b{display:block;font-size:4.7cqw;font-weight:900;text-transform:uppercase;line-height:1.15;overflow-wrap:anywhere}
+.id2-fields b.one{white-space:nowrap;overflow:hidden}
+.id2-fields b.addr{max-height:9.6cqw;overflow:hidden}
+.id2-qr{left:34cqw;width:32cqw;top:103cqw;background:#fff;padding:1.2cqw}
+.id2-qr canvas,.id2-qr img{width:100%!important;height:auto!important;display:block}
+.id2-adviser{left:7cqw;right:7cqw;top:139cqw;display:flex;gap:2cqw;align-items:baseline;font-size:3.7cqw}
+.id2-adviser b{flex:1;min-width:0;border-bottom:.4cqw solid #111;font-size:4.2cqw;font-weight:900;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+@media print{.id-preview{gap:5mm!important;justify-content:flex-start!important}.id2{width:54mm!important;box-shadow:none!important;border:.2mm solid #bbb}}
