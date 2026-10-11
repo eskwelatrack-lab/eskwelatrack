@@ -150,7 +150,7 @@ function applyRoleAccess() {
 function togglePassword() {
   const i = $("loginPassword"), show = i.type === "password";
   i.type = show ? "text" : "password";
-  $("pwToggle").textContent = show ? "🙈 Hide" : "👁 Show";
+  $("pwToggle").textContent = show ? "Hide" : "Show";
   $("pwToggle").setAttribute("aria-pressed", String(show));
   i.focus();
 }
