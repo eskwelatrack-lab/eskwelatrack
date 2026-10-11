@@ -334,68 +334,60 @@ async function registerStudent() {
   finally { btn.disabled = false; }
 }
 
+/* Shrinks one-line text (in cqw units) until it fits its box. */
+function fitLine(el, start, min) {
+  let f = start;
+  el.style.fontSize = f + "cqw";
+  while ((el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight) && f > min) { f -= 0.3; el.style.fontSize = f + "cqw"; }
+}
+
 function renderID(s, d, token) {
   const photo = safePhoto(d.photo);
-  const photoHTML = photo ? `<img src="${photo}" alt="Student photo">` : `<span>2x2<br>STUDENT<br>PHOTO</span>`;
+  const logo = document.querySelector(".brand img").src;
   $("idOutput").innerHTML = `
   <div class="id-preview" id="printCard">
-    <div class="school-id">
-      <div class="id-top-ribbon"></div>
-      <div class="id-school-head">
-        <div class="dept">REPUBLIC OF THE PHILIPPINES<br>DEPARTMENT OF EDUCATION<br>REGION IX - ZAMBOANGA PENINSULA<br>DIVISION OF PAGADIAN CITY</div>
-        <div class="school-title">STA. LUCIA NATIONAL HIGH SCHOOL</div>
-        <div class="school-city">Pagadian City</div>
+    <div class="id2">
+      <div class="id2-top"></div>
+      <img class="id2-deped" src="assets/deped-logo.png" alt="" onerror="this.style.display='none'">
+      <div class="id2-head">
+        <div>Department of Education</div>
+        <div>Region IX, Zamboanga Peninsula</div>
+        <div class="id2-school">STA. LUCIA NATIONAL HIGH SCHOOL</div>
+        <div>Sta. Lucia, Pagadian City</div>
       </div>
-      <div class="id-front-main">
-        <div class="id-photo">${photoHTML}</div>
-        <div>
-          <div class="id-field-label">Name of Learner</div>
-          <div class="id-field-value id-name">${esc(s.name)}</div>
-          <div class="id-field-label">Learner's Reference Number</div>
-          <div class="id-field-value id-lrn">${esc(s.studentId)}</div>
-          <div class="id-field-label">Grade - Section</div>
-          <div class="id-field-value">${esc(s.section)}</div>
-        </div>
-        <img class="id-logo" src="${document.querySelector('.brand img').src}" alt="School logo">
+      <div class="id2-photo">${photo ? `<img src="${photo}" alt="Student photo">` : "<span>2x2<br>PHOTO</span>"}</div>
+      <img class="id2-seal" src="${logo}" alt="School seal">
+      <div class="id2-namebar">
+        <div class="id2-name" data-fit="8.5,3.5">${esc(s.name)}</div>
+        <div class="id2-tag">Name of Learner</div>
       </div>
-      <div class="id-band">
-        <div><div class="id-field-label">School Year</div><div class="id-field-value">${esc(d.schoolYear || settings.schoolYear || "2026-2027")}</div></div>
-        <div><div class="id-field-label">Status</div><div class="id-field-value">${esc(s.status || "Active")}</div></div>
-      </div>
-      <div class="id-sign"><div class="id-sign-line"></div><small>${esc(d.principal || "School Principal")}<br>Principal</small></div>
+      <div class="id2-box id2-lrn"><div class="v" data-fit="6.2,3.5">${esc(s.studentId)}</div><div class="l">Learner's Reference Number</div></div>
+      <div class="id2-box id2-grade"><div class="v" data-fit="6.2,3.5">${esc(s.section)}</div><div class="l">Grade / Section</div></div>
+      <img class="id2-sig" src="assets/principal-signature.png" alt="" onerror="this.style.display='none'">
+      <div class="id2-principal"><b data-fit="4.6,3">${esc(d.principal || settings.principal || "PRINCIPAL")}</b><span>Principal - IV</span></div>
+      <div class="id2-bottom"></div>
     </div>
 
-    <div class="school-id id-back">
-      <div class="id-top-ribbon"></div>
-      <div class="id-back-title">STUDENT IDENTIFICATION CARD</div>
-      <div class="id-rule"><b>This card is non-transferable.</b> It must be worn at all times when inside school premises. If found, please return it to the school. Any alteration or erasure will make it invalid.</div>
-      <div class="id-back-body">
-        <div class="id-back-grid">
-          <div class="id-back-item"><b>Name</b><span>${esc(s.name)}</span></div>
-          <div class="id-back-item"><b>LRN</b><span>${esc(s.studentId)}</span></div>
-          <div class="id-back-item full"><b>Address</b><span>${esc(d.address || "—")}</span></div>
-          <div class="id-back-item"><b>Contact Number</b><span>${esc(d.contact || "—")}</span></div>
-          <div class="id-back-item"><b>Valid Until</b><span>${esc(d.schoolYear || settings.schoolYear || "2026-2027")}</span></div>
-          <div class="id-back-item full"><b>Parent / Guardian</b><span>${esc(d.guardian || "—")}</span></div>
-          <div class="id-back-item full"><b>Adviser</b><span>${esc(d.adviser || "—")}</span></div>
-        </div>
-        <div class="id-qr-box">
-          <div id="qrcode"></div>
-          <small>ATTENDANCE QR<br>Scan to record attendance</small>
-        </div>
+    <div class="id2">
+      <div class="id2-top"></div>
+      <p class="id2-rule">This card is non-transferable. It must be worn at all times when inside the school premises by the student whose name and signature appear herein. Any alteration or addition will make it invalid.</p>
+      <div class="id2-emerg">IN CASE OF EMERGENCY, PLEASE NOTIFY:</div>
+      <div class="id2-fields">
+        <div><small>Parents/Guardian Name:</small><b class="one" data-fit="4.7,3">${esc(d.guardian || "—")}</b></div>
+        <div><small>Address:</small><b class="addr" data-fit="4.2,2.8">${esc(d.address || "—")}</b></div>
+        <div><small>Contact Number:</small><b class="one" data-fit="4.7,3">${esc(d.contact || "—")}</b></div>
       </div>
-      <div class="id-contact">If found, please return to STA. LUCIA NATIONAL HIGH SCHOOL, PAGADIAN CITY.</div>
-      <div class="id-back-footer">
-        <div><div class="line"></div><small>STUDENT'S SIGNATURE</small></div>
-        <div><div class="line"></div><small>${esc(d.principal || "PRINCIPAL")}<br>PRINCIPAL</small></div>
-      </div>
+      <div class="id2-qr"><div id="qrcode"></div></div>
+      <div class="id2-adviser"><small>Adviser:</small><b data-fit="4.2,3">${esc(d.adviser || "—")}</b></div>
+      <div class="id2-bottom"></div>
     </div>
   </div>
   <div class="card id-qr-card no-print">
-    <small class="hint">The attendance QR code is printed on the back of the ID. The QR holds a random secret code, not the LRN.</small>
+    <small class="hint">The attendance QR code is printed on the back of the ID. It holds a random secret code, not the LRN.</small>
     <button class="btn lightbtn" data-regen="${esc(s.studentId)}">🔄 Regenerate QR (lost / stolen ID)</button>
   </div>`;
-  new QRCode($("qrcode"), { text: makeQRData(token), width: 112, height: 112, colorDark: "#000", colorLight: "#fff", correctLevel: QRCode.CorrectLevel.M });
+  new QRCode($("qrcode"), { text: makeQRData(token), width: 256, height: 256, colorDark: "#000", colorLight: "#fff", correctLevel: QRCode.CorrectLevel.M });
+  $("idOutput").querySelectorAll("[data-fit]").forEach(el => { const [a, b] = el.dataset.fit.split(","); fitLine(el, +a, +b); });
 }
 
 async function showID(lrn) {
