@@ -431,3 +431,18 @@ tr.grp td{background:#f7e9ec;color:#6f1025;font-weight:900;letter-spacing:.3px}
 .id2-adviser{left:7cqw;right:7cqw;top:139cqw;display:flex;gap:2cqw;align-items:baseline;font-size:3.7cqw}
 .id2-adviser b{flex:1;min-width:0;border-bottom:.4cqw solid #111;font-size:4.2cqw;font-weight:900;text-transform:uppercase;white-space:nowrap;overflow:hidden}
 @media print{.id-preview{gap:5mm!important;justify-content:flex-start!important}.id2{width:54mm!important;box-shadow:none!important;border:.2mm solid #bbb}}
+
+/* ===== Login page: the staff sign-in card over a balanced background (blue banner left, red school logo right) ===== */
+#loginGate{align-items:flex-start;padding:24px;overflow:auto;background:linear-gradient(90deg,#071a52 0%,#15081f 50%,#4a0a1c 100%)}
+#loginGate::before{display:none}
+.lg-art{position:fixed;top:0;bottom:0;width:50%;overflow:hidden;pointer-events:none}
+.lg-art-left{left:0}
+.lg-art-right{right:0}
+.lg-art img{filter:blur(2px)}
+.lg-art::after{content:"";position:absolute;inset:0}
+.lg-art-left img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+.lg-art-left::after{background:linear-gradient(90deg,rgba(5,38,130,.86),rgba(8,24,74,.66))}
+.lg-art-right img{position:absolute;left:50%;top:50%;width:min(86vh,46vw);height:min(86vh,46vw);transform:translate(-50%,-50%);object-fit:cover;border-radius:50%}
+.lg-art-right::after{background:linear-gradient(270deg,rgba(150,14,42,.86),rgba(96,8,30,.66))}
+.login-box{position:relative;z-index:2;flex:none;margin:auto;width:min(680px,100%);padding:34px 46px 28px;border-radius:30px;border-top:6px solid #d9a441;background:linear-gradient(145deg,rgba(255,253,251,.98),rgba(255,247,242,.96));box-shadow:0 35px 100px rgba(0,0,0,.55)}
+@media(max-width:500px){.login-box{padding:26px 16px 20px}.login-box h2{font-size:25px}}
