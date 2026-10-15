@@ -11,74 +11,59 @@
 <body class="login-locked">
 
 <div id="loginGate" aria-modal="true" role="dialog">
-  <div class="login-shell">
-    <div class="login-visuals" aria-hidden="true">
-      <div class="visual-panel digital-panel">
-        <img src="assets/system-banner.jpg" alt="Automated Digital Attendance System">
-        <div class="visual-overlay"></div>
-        <div class="visual-caption">
-          <span class="caption-kicker">SMART • SECURE • DIGITAL</span>
-          <strong>EskwelaTrack</strong>
-          <small>Sta. Lucia National High School</small>
-        </div>
+  <!-- balanced background: system banner (blue) on the left, school logo (red) on the right -->
+  <div class="lg-art lg-art-left" aria-hidden="true"><img src="assets/system-banner.jpg" alt=""></div>
+  <div class="lg-art lg-art-right" aria-hidden="true"><img src="assets/school-logo.jpg" alt=""></div>
+
+  <div class="login-box">
+    <div class="login-topline"><span></span><b>AUTHORIZED ACCESS</b><span></span></div>
+    <div class="login-emblem">
+      <img id="loginLogo" class="login-logo" src="assets/school-logo.jpg" alt="Sta. Lucia National High School logo">
+    </div>
+    <div class="login-heading">
+      <div class="welcome">WELCOME BACK</div>
+      <h2>Authorized Staff Sign In</h2>
+      <p class="login-sub">Sign in with your school staff account. Your access is automatically limited to the functions assigned to your role.</p>
+    </div>
+
+    <div class="login-role-info">
+      <div class="role-info-card admin-role-info">
+        <div class="role-info-icon">🛡️</div>
+        <div><strong>ADMINISTRATOR</strong><small>Full system access</small><span>Register students • Manage records &amp; staff accounts • Edit system • Scanner • Reports</span></div>
       </div>
-      <div class="visual-panel school-panel">
-        <img src="assets/school-logo.jpg" alt="Sta. Lucia National High School logo">
-        <div class="school-glow"></div>
-        <div class="school-label">STA. LUCIA<br><span>NATIONAL HIGH SCHOOL</span></div>
+      <div class="role-info-card teacher-role-info">
+        <div class="role-info-icon">👩‍🏫</div>
+        <div><strong>TEACHER</strong><small>Attendance &amp; monitoring</small><span>Scan attendance • Monitor who is present • View reports</span></div>
       </div>
     </div>
 
-    <div class="login-box">
-      <div class="login-topline"><span></span><b>AUTHORIZED ACCESS</b><span></span></div>
-      <div class="login-emblem">
-        <img id="loginLogo" class="login-logo" src="assets/school-logo.jpg" alt="Sta. Lucia National High School logo">
-      </div>
-      <div class="login-heading">
-        <div class="welcome">WELCOME BACK</div>
-        <h2>Authorized Staff Sign In</h2>
-        <p class="login-sub">Sign in with your school staff account. Your access is automatically limited to the functions assigned to your role.</p>
+    <div class="login-form-card">
+      <div class="login-field">
+        <label for="loginUsername"><span class="field-icon">◉</span> Email</label>
+        <input id="loginUsername" type="email" autocomplete="username" placeholder="Enter your email">
       </div>
 
-      <div class="login-role-info">
-        <div class="role-info-card admin-role-info">
-          <div class="role-info-icon">🛡️</div>
-          <div><strong>ADMINISTRATOR</strong><small>Full system access</small><span>Register students • Manage records &amp; staff accounts • Edit system • Scanner • Reports</span></div>
-        </div>
-        <div class="role-info-card teacher-role-info">
-          <div class="role-info-icon">👩‍🏫</div>
-          <div><strong>TEACHER</strong><small>Attendance &amp; monitoring</small><span>Scan attendance • Monitor who is present • View reports</span></div>
-        </div>
-      </div>
-
-      <div class="login-form-card">
-        <div class="login-field">
-          <label for="loginUsername"><span class="field-icon">◉</span> Email</label>
-          <input id="loginUsername" type="email" autocomplete="username" placeholder="Enter your email">
-        </div>
-
-        <div class="login-field">
-          <label for="loginPassword"><span class="field-icon">◆</span> Password</label>
-          <div class="pw-wrap">
-            <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter your password"
+      <div class="login-field">
+        <label for="loginPassword"><span class="field-icon">◆</span> Password</label>
+        <div class="pw-wrap">
+          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter your password"
                  onkeydown="if(event.key==='Enter') loginSystem()">
-            <button type="button" id="pwToggle" class="pw-toggle" onclick="togglePassword()" aria-pressed="false" aria-label="Show or hide password">Show</button>
-          </div>
+          <button type="button" id="pwToggle" class="pw-toggle" onclick="togglePassword()" aria-pressed="false" aria-label="Show or hide password">👁 Show</button>
         </div>
-
-        <button class="login-btn" id="loginBtn" onclick="loginSystem()"><span>🔐</span> Sign In Securely <i>→</i></button>
-        <div id="loginError" class="login-error">Invalid email or password.</div>
-        <button type="button" class="link-btn" onclick="resetPassword()">Forgot password?</button>
-        <div id="configWarning" class="login-error" style="display:none">Firebase is not configured yet. Fill in <b>js/firebase-config.js</b> (see SETUP.md).</div>
       </div>
 
-      <div class="login-footer">
-        <span>●</span> Authorized school personnel only
-      </div>
+      <button class="login-btn" id="loginBtn" onclick="loginSystem()"><span>🔐</span> Sign In Securely <i>→</i></button>
+      <div id="loginError" class="login-error">Invalid email or password.</div>
+      <button type="button" class="link-btn" onclick="resetPassword()">Forgot password?</button>
+      <div id="configWarning" class="login-error" style="display:none">Firebase is not configured yet. Fill in <b>js/firebase-config.js</b> (see SETUP.md).</div>
+    </div>
+
+    <div class="login-footer">
+      <span>●</span> Authorized school personnel only
     </div>
   </div>
 </div>
-
+  
 <div class="app">
 <aside class="sidebar">
   <div class="brand">
