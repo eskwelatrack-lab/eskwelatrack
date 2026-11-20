@@ -120,7 +120,6 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;bord
 .scanner-device-bottom{display:flex;justify-content:space-between;color:#9fc8ff;font-size:10px;letter-spacing:1px}
 @media(max-width:900px){.scanner-system-layout{grid-template-columns:1fr}}
 
-/* EDITABLE SYSTEM CONTROLS */
 .edit-btn{background:linear-gradient(135deg,#6f1025,#9d2947);color:#fff;padding:10px 14px;border-radius:11px;font-weight:900;box-shadow:0 7px 18px rgba(111,16,37,.18)}
 .edit-btn:hover{transform:translateY(-1px);filter:brightness(1.06)}
 .editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -131,7 +130,6 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;bord
 @media(max-width:700px){.editor-grid{grid-template-columns:1fr}.editor-grid .full{grid-column:auto}}
 
 
-/* MAROON SCHOOL THEME + UI IMPROVEMENTS */
 .school-accent{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin:0 0 10px;color:#6f1025;font-size:11px;font-weight:900;letter-spacing:1.4px}.school-accent span:nth-child(2){color:#d9a441}@media(max-width:780px){.school-accent{justify-content:center;font-size:9px;letter-spacing:1px}}
 
 body{background:linear-gradient(135deg,#fff8f2 0%,#f8ece9 45%,#f4e1e4 100%);}
@@ -174,7 +172,6 @@ th{color:#6f1025;background:#fcf1ee}
 @media(max-width:780px){.sidebar{box-shadow:0 8px 24px rgba(67,9,20,.2)}}
 
 
-/* FULL SCHOOL PHOTO BACKGROUND */
 html,body{min-height:100%;}
 body{
   background:#3b0a16 url("../assets/campus.jpg") center center / cover fixed no-repeat !important;
@@ -213,8 +210,6 @@ body::before{
   }
 }
 
-
-/* ADMIN / TEACHER LOGIN GATE — AESTHETIC SIDE-BY-SIDE DESIGN */
 #loginGate{
   position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
   padding:24px;overflow:auto;
@@ -274,7 +269,7 @@ body::before{
 .login-footer>span{color:#16803a;font-size:10px;margin-right:3px;}
 .demo-accounts{margin-top:4px;color:#a08b90;}
 .demo-accounts b{color:#765f65;}
-/* ROLE PERMISSION CARDS */
+
 .login-role-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 13px;position:relative;z-index:1}
 .role-info-card{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid #ead7dc;border-radius:14px;background:rgba(255,255,255,.78);transition:.2s}
 .role-info-card:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(67,9,20,.08)}
@@ -310,7 +305,6 @@ body.login-locked .app{visibility:hidden}
   .demo-accounts{font-size:8px;}
 }
 
-/* ===== Additions for the Firebase version ===== */
 .link-btn{background:none;border:0;color:#8e2340;font-weight:700;font-size:12.5px;text-decoration:underline;cursor:pointer;margin-top:10px;padding:2px}
 .hint{display:block;color:#64748b;font-size:12px;margin-top:6px;line-height:1.4}
 .photo-picker{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
@@ -338,29 +332,24 @@ body.login-locked .app{visibility:hidden}
   table{font-size:11px}
 }
 
-/* scan mode tabs */
 .mode-tabs{display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap}
 .mode-tabs button{flex:1;min-width:150px;padding:12px 14px;border-radius:12px;border:2px solid #e2cdd2;background:#fff;color:#6f1025;font-weight:800;cursor:pointer}
 .mode-tabs button.active{background:#6f1025;border-color:#6f1025;color:#fff}
 #scanHint .link-btn{margin:0 0 0 4px}
 
-/* show/hide password */
 .pw-wrap{position:relative}
 .pw-wrap input{padding-right:84px}
 .pw-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#f7e9ec;color:#6f1025;border:0;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:800;cursor:pointer}
 
-/* time in / time out */
 .phase-banner{padding:12px 16px;border-radius:12px;margin:0 0 14px;font-size:14px;border:1px solid #e2cdd2;background:#f7f4f5}
 .phase-banner.in{background:#e8f7ee;border-color:#9bd6b0}
 .phase-banner.out{background:#e8f0fb;border-color:#9bb8e6}
 .tag{font-style:normal;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;color:#fff}
 .tag.in{background:#16a34a}.tag.out{background:#2563eb}
 
-/* modals taller than the screen: scroll inside the box so ✕ and Save stay reachable */
 .modal-box{max-height:calc(100vh - 40px);overflow-y:auto}
 .modal{overflow-y:auto}
 
-/* four-scan schedule, report chips */
 .sched-row{display:grid;grid-template-columns:130px repeat(3,1fr);gap:10px;align-items:end;margin-top:10px;padding:10px;border:1px solid #eadde0;border-radius:12px;background:#fbf7f8}
 .sched-row>b{align-self:center;color:#6f1025}
 @media(max-width:700px){.sched-row{grid-template-columns:1fr 1fr}.sched-row>b{grid-column:1/-1}}
@@ -375,7 +364,6 @@ tr.grp td{background:#f7e9ec;color:#6f1025;font-weight:900;letter-spacing:.3px}
 .tag.late{background:#ea580c}
 @media print{.slot,tr.grp td,.phase-banner{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 
-/* ID cards: front and back are the same size; the attendance QR is printed on the back */
 .id-preview{grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}
 .school-id{display:flex;flex-direction:column;min-height:440px}
 .id-sign{margin-top:auto}
@@ -392,8 +380,6 @@ tr.grp td{background:#f7e9ec;color:#6f1025;font-weight:900;letter-spacing:.3px}
 @media print{.school-id{min-height:420px}.id-qr-box #qrcode{padding:4px}}
 
 
-/* ===== Student ID: standard CR80 portrait card (54 x 85.6 mm), same layout as the school's printed ID ===== */
-/* Everything inside is sized in cqw (1% of the card width), so the card scales perfectly from screen to print. */
 .id-preview{display:flex!important;flex-wrap:wrap;gap:22px;justify-content:center;align-items:flex-start}
 .id2{position:relative;box-sizing:border-box;container-type:inline-size;flex:none;width:324px;aspect-ratio:54/85.6;background:#fff;border-radius:3.5%/2.2%;overflow:hidden;box-shadow:0 8px 22px rgba(0,0,0,.18);font-family:Arial,Helvetica,sans-serif;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .id2 *{box-sizing:border-box}
@@ -418,7 +404,7 @@ tr.grp td{background:#f7e9ec;color:#6f1025;font-weight:900;letter-spacing:.3px}
 .id2-principal{left:34cqw;width:64cqw;top:130cqw;text-align:center}
 .id2-principal b{display:block;font-size:4.6cqw;font-weight:900;text-transform:uppercase;white-space:nowrap;overflow:hidden}
 .id2-principal span{font-size:4cqw}
-/* back */
+
 .id2-rule{left:7cqw;right:7cqw;top:13cqw;margin:0;font-size:4.3cqw;line-height:1.42;text-align:justify}
 .id2-emerg{left:0;right:0;top:50cqw;height:7.5cqw;background:#a8162b;color:#fff;font-weight:800;font-size:3.4cqw;text-align:center;line-height:7.5cqw}
 .id2-fields{left:7cqw;right:7cqw;top:60cqw;display:flex;flex-direction:column;gap:2.5cqw}
@@ -432,7 +418,6 @@ tr.grp td{background:#f7e9ec;color:#6f1025;font-weight:900;letter-spacing:.3px}
 .id2-adviser b{flex:1;min-width:0;border-bottom:.4cqw solid #111;font-size:4.2cqw;font-weight:900;text-transform:uppercase;white-space:nowrap;overflow:hidden}
 @media print{.id-preview{gap:5mm!important;justify-content:flex-start!important}.id2{width:54mm!important;box-shadow:none!important;border:.2mm solid #bbb}}
 
-/* ===== Login page: the staff sign-in card over a balanced background (blue banner left, red school logo right) ===== */
 #loginGate{align-items:flex-start;padding:24px;overflow:auto;background:linear-gradient(90deg,#071a52 0%,#15081f 50%,#4a0a1c 100%)}
 #loginGate::before{display:none}
 .lg-art{position:fixed;top:0;bottom:0;width:50%;overflow:hidden;pointer-events:none}
