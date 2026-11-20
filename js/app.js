@@ -12,13 +12,12 @@ import {
 
 const $ = (id) => document.getElementById(id);
 
-/* ============================== state ============================== */
 const ROLE_LABEL = { admin: "Administrator", teacher: "Teacher" };
 const ROLE_PERMISSIONS = {
   admin: ["dashboard", "admin", "students", "scanner", "reports"],
   teacher: ["dashboard", "scanner", "reports"]
 };
-let me = null;                       // {uid,email,name,role}
+let me = null;                      
 let students = [], studentMap = new Map();
 let todayRecords = [], currentDate = dateKey();
 let unsubs = [], todayUnsub = null, midnightTimer = null;
@@ -41,7 +40,6 @@ function friendlyError(e) {
   return e?.message || "Something went wrong.";
 }
 
-/* ============================== settings / customization ============================== */
 const defaultEdit = {
   schoolName: "STA. LUCIA NATIONAL HIGH SCHOOL", schoolCity: "PAGADIAN CITY",
   systemTitle: "Automated Digital Attendance System",
@@ -52,7 +50,7 @@ const defaultEdit = {
 };
 let settings = { ...defaultEdit };
 const getSchedule = () => Object.fromEntries(SCHEDULE_KEYS.map(k => [k, Number(settings[k] ?? DEFAULT_SCHEDULE[k])]));
-const SCHEDULE_UI = [["amIn", true], ["amOut", false], ["pmIn", true], ["pmOut", false]];   // [slot, hasOnTimeLimit]
+const SCHEDULE_UI = [["amIn", true], ["amOut", false], ["pmIn", true], ["pmOut", false]];   
 function buildScheduleFields() {
   $("scheduleFields").innerHTML = SCHEDULE_UI.map(([k, hasLate]) => `
     <div class="sched-row"><b>${SLOT_LABEL[k]}</b>
@@ -117,7 +115,6 @@ async function toggleEditText() {
   }
 }
 
-/* ============================== navigation ============================== */
 const pageTitles = () => ({
   dashboard: settings.systemTitle, admin: "Admin / Teacher Control Center", students: "Student Registration & Records",
   scanner: "System QR Scanner", reports: "Attendance Reports"
@@ -146,7 +143,6 @@ function applyRoleAccess() {
   $("currentRole").textContent = role ? `${ROLE_LABEL[role]}${me.name ? " — " + me.name : ""}` : "Not signed in";
 }
 
-/* ============================== login / session ============================== */
 function togglePassword() {
   const i = $("loginPassword"), show = i.type === "password";
   i.type = show ? "text" : "password";
@@ -177,7 +173,7 @@ async function loginSystem() {
   if (!email || !password) return showLoginError("Enter your email and password.");
   const btn = $("loginBtn"); btn.disabled = true;
   try {
-    await setPersistence(auth, browserSessionPersistence);   // signed out when the tab closes (shared school PCs)
+    await setPersistence(auth, browserSessionPersistence);  
     await signInWithEmailAndPassword(auth, email, password);
   } catch (e) {
     const bad = ["auth/invalid-credential", "auth/wrong-password", "auth/user-not-found", "auth/invalid-login-credentials"];
@@ -210,7 +206,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-/* ============================== live data ============================== */
 function onListenErr(e) { console.error(e); }
 function startListeners() {
   stopListeners();
@@ -248,7 +243,6 @@ function updateStats() {
   $("teacherPresent").textContent = present;
 }
 
-/* ============================== student form ============================== */
 function formFields(p, editing = false) {
   return `
     <div class="full"><label>Full Name</label><input id="${p}Name" placeholder="e.g. JUAN D. CRUZ"></div>
@@ -296,7 +290,6 @@ function fillFormDefaults() {
   if (!$("regPrincipal").value) $("regPrincipal").value = settings.principal || "";
 }
 
-/* ---- photo: resize to a 300x300 JPEG (≈20–40 KB) so it fits comfortably in Firestore ---- */
 async function fileToSquareJPEG(file, size = 300) {
   let bmp;
   try { bmp = await createImageBitmap(file, { imageOrientation: "from-image" }); } catch { bmp = await createImageBitmap(file); }
@@ -315,7 +308,6 @@ function bindPhoto(p) {
   });
 }
 
-/* ============================== register / ID card ============================== */
 async function registerStudent() {
   if (!isAdmin()) return deny("Only the Administrator can register students.");
   const v = readForm("reg"), err = validateForm(v, true);
@@ -334,7 +326,6 @@ async function registerStudent() {
   finally { btn.disabled = false; }
 }
 
-/* Shrinks one-line text (in cqw units) until it fits its box. */
 function fitLine(el, start, min) {
   let f = start;
   el.style.fontSize = f + "cqw";
@@ -409,7 +400,6 @@ async function regenQR(lrn) {
   try { await api.regenerateQR(lrn); await showID(lrn); } catch (e) { alert(friendlyError(e)); }
 }
 
-/* Print only the chosen section (everything else is hidden by .page/.no-print print rules). */
 function printSection(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("print-page"));
   $(id).classList.add("print-page");
@@ -421,7 +411,6 @@ function printId() {
   printSection("students");
 }
 
-/* ============================== student records (list / edit / delete) ============================== */
 const bySectionName = (a, b) => (a.section || "").localeCompare(b.section || "") || (a.name || "").localeCompare(b.name || "");
 const ROW_LIMIT = 200;
 function renderStudentTable() {
@@ -480,7 +469,6 @@ async function deleteStudent(lrn) {
   } catch (e) { alert(friendlyError(e)); }
 }
 
-/* ============================== confirm dialog (reuses #modal) ============================== */
 let pendingConfirm = null;
 function confirmDialog(title, html, okLabel = "Confirm", danger = false) {
   return new Promise(resolve => {
@@ -501,7 +489,6 @@ function closeModal(result = false) {
   const r = pendingConfirm; pendingConfirm = null; r?.(result === true);
 }
 
-/* ============================== scanner ============================== */
 let qr = null, camOn = false, facing = "environment", scanBusy = false, lastText = "", lastAt = 0, audioCtx = null;
 
 function beep(ok) {
@@ -510,7 +497,7 @@ function beep(ok) {
     const o = audioCtx.createOscillator(), g = audioCtx.createGain();
     o.frequency.value = ok ? 880 : 220; g.gain.value = 0.08; o.connect(g); g.connect(audioCtx.destination);
     o.start(); o.stop(audioCtx.currentTime + (ok ? 0.12 : 0.3));
-  } catch { /* sound is optional */ }
+  } catch { }
 }
 function setCamUI() {
   const cam = scanMode === "camera";
@@ -526,7 +513,7 @@ function setCamUI() {
   $("modeCam").classList.toggle("active", cam);
   $("useCameraLink").style.display = cam ? "none" : "";
 }
-/* ---- scan mode: USB scanner (default) or device camera; remembered per device ---- */
+
 const MODE_KEY = "slnhs_scan_mode";
 const cameraSupported = () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 let scanMode = "usb", usbFailStreak = 0;
@@ -546,7 +533,7 @@ async function setScanMode(mode) {
   if (mode === "camera") { setCamUI(); await startCamera(); }
   else { await stopCamera(); setCamUI(); focusUsb(); }
 }
-/** Called when the scanner page opens: apply the saved mode. */
+
 async function enterScanner() {
   showScanHint("");
   if (scanMode === "camera" && !cameraSupported()) scanMode = "usb";
@@ -593,7 +580,6 @@ async function processScan(raw, source = "usb") {
   let r;
   try { r = await api.recordAttendance(raw, getSchedule()); } catch (e) { r = { ok: false, reason: "error", message: friendlyError(e) }; }
   if (source === "usb") {
-    // Several rejects in a row from the USB scanner usually mean a scanner/keyboard problem, not a bad card.
     usbFailStreak = (!r.ok && r.reason === "invalid") ? usbFailStreak + 1 : 0;
     if (usbFailStreak >= 3) {
       showScanHint(`<b>The USB scanner's scans keep being rejected.</b> Check that Caps Lock is off and the scanner sends Enter after each scan, or <button type="button" class="link-btn" onclick="setScanMode('camera')">switch to the device camera</button>.`);
@@ -635,7 +621,6 @@ function renderRecentScans() {
     : "<li class='empty'>No scans yet today.</li>";
 }
 
-/* ============================== reports ============================== */
 function initReportDates() { $("repFrom").value = currentDate; $("repTo").value = currentDate; }
 function setPreset(kind) {
   const d = new Date(currentDate + "T00:00:00Z");
@@ -711,7 +696,6 @@ function downloadCSV() {
   a.click(); URL.revokeObjectURL(a.href);
 }
 
-/* ============================== staff accounts (admin) ============================== */
 async function loadUsers() {
   if (!isAdmin()) return;
   const body = $("usersBody");
@@ -744,7 +728,6 @@ async function removeUser(uid, name) {
   try { await api.removeStaffAccess(uid); loadUsers(); } catch (e) { alert(friendlyError(e)); }
 }
 
-/* ============================== boot ============================== */
 $("regFields").innerHTML = formFields("reg"); bindPhoto("reg");
 $("studentBody").addEventListener("click", (e) => {
   const b = e.target.closest("button[data-act]"); if (!b) return;
@@ -753,7 +736,6 @@ $("studentBody").addEventListener("click", (e) => {
 $("idOutput").addEventListener("click", (e) => { const b = e.target.closest("button[data-regen]"); if (b) regenQR(b.dataset.regen); });
 $("usersBody").addEventListener("click", (e) => { const b = e.target.closest("button[data-user-remove]"); if (b) removeUser(b.dataset.userRemove, b.dataset.name); });
 $("studentSearch").addEventListener("input", renderStudentTable);
-// USB scanners type like a keyboard: if a character arrives while nothing text-like is focused, send it to the scan box.
 document.addEventListener("keydown", (e) => {
   if (scanMode !== "usb" || !scannerOpen() || modalOpen() || e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
   if (e.target.matches("input,textarea,select,[contenteditable='true']")) return;
@@ -763,7 +745,7 @@ $("manualScan").addEventListener("blur", () => setTimeout(() => { if (document.a
 $("repSection").addEventListener("change", () => renderReport());
 $("manualScan").addEventListener("keydown", async (e) => {
   if (e.key !== "Enter") return;
-  const v = e.target.value; e.target.value = ""; await onScanText(v, "usb"); focusUsb();     // USB scanners "type" the code + Enter
+  const v = e.target.value; e.target.value = ""; await onScanText(v, "usb"); focusUsb();    
 });
 $("editMaroon").addEventListener("input", e => $("maroonHex").textContent = e.target.value);
 $("editGold").addEventListener("input", e => $("goldHex").textContent = e.target.value);
@@ -788,14 +770,12 @@ setInterval(updateClock, 1000); updateClock();
 if (!configured) $("configWarning").style.display = "block";
 buildScheduleFields();
 applyEdit(defaultEdit); setCamUI(); lockUI();
-setInterval(() => { if (me && reportIsOpen()) renderReport(); }, 60000);   // pending scans turn red once their window closes
+setInterval(() => { if (me && reportIsOpen()) renderReport(); }, 60000);   
 
-// Safety net: Esc or a click on the dark backdrop closes any open pop-up window.
 const closeAnyModal = (m) => { if (m.id === "editorModal") closeEditor(); else if (m.id === "studentModal") closeStudentModal(); else closeModal(false); };
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll(".modal.show").forEach(closeAnyModal); });
 document.querySelectorAll(".modal").forEach(m => m.addEventListener("mousedown", (e) => { if (e.target === m) closeAnyModal(m); }));
 
-// Inline onclick="" handlers in index.html need these on window (modules are not global).
 Object.assign(window, {
   togglePassword, go, showPage, loginSystem, logoutSystem, resetPassword, registerStudent, printId, openEditor, saveEditor, resetEditor, closeEditor,
   toggleEditText, closeModal, closeStudentModal, saveStudentEdit, clearPhoto, processScan, startCamera, stopCamera, flipCamera, setScanMode,
