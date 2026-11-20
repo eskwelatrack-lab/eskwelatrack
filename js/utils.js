@@ -1,9 +1,6 @@
-// Pure helpers (no Firebase, no DOM) so they can be unit-tested in Node.
-
-export const TZ = "Asia/Manila"; // UTC+8, no daylight saving
+export const TZ = "Asia/Manila"; 
 const dateFmt = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" });
 
-/** "YYYY-MM-DD" in Philippine time (fixes the UTC date bug). */
 export const dateKey = (d = new Date()) => dateFmt.format(d);
 export const formatTime = (d) => d ? d.toLocaleTimeString("en-PH", { timeZone: TZ, hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "—";
 export const formatDate = (key) => new Date(key + "T00:00:00+08:00").toLocaleDateString("en-PH", { timeZone: TZ, year: "numeric", month: "short", day: "numeric" });
@@ -14,12 +11,11 @@ export function escapeHTML(v) {
 
 export const isValidLRN = (v) => /^\d{12}$/.test(v);
 
-// ---- QR payloads: "SLNHS:" + 192-bit random token. The LRN is NOT in the QR. ----
 export const QR_PREFIX = "SLNHS:";
 export function makeToken() {
   const bytes = new Uint8Array(24);
   crypto.getRandomValues(bytes);
-  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); // 32 chars
+  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); 
 }
 export const makeQRData = (token) => QR_PREFIX + token;
 export function parseQR(raw) {
@@ -30,9 +26,6 @@ export function parseQR(raw) {
   return /^[A-Za-z0-9_-]{32}$/.test(t) ? t : null;
 }
 
-// ---- Four scans per day: Morning IN/OUT and Afternoon IN/OUT ----
-// All times are minutes after midnight in Philippine time. A window is [Start, End) (End is exclusive).
-// "Late" = on-time limit for the two IN scans: a scan after that minute is recorded as LATE (orange).
 export const SLOTS = ["amIn", "amOut", "pmIn", "pmOut"];
 export const IN_SLOTS = ["amIn", "pmIn"];
 export const SLOT_LABEL = { amIn: "Morning IN", amOut: "Morning OUT", pmIn: "Afternoon IN", pmOut: "Afternoon OUT" };
@@ -63,12 +56,10 @@ export function label12(n) {                          // 450 -> "7:30 AM"
 }
 export const formatTimeShort = (d) => d ? d.toLocaleTimeString("en-PH", { timeZone: TZ, hour: "numeric", minute: "2-digit" }) : "—";
 
-/** Which scan is open at this minute? "amIn" | "amOut" | "pmIn" | "pmOut" | null */
 export function scanSlot(min, s) {
   for (const slot of SLOTS) if (min >= s[slot + "Start"] && min < s[slot + "End"]) return slot;
   return null;
 }
-/** Only the two IN scans can be late. */
 export const isLateScan = (slot, min, s) => IN_SLOTS.includes(slot) && min > s[slot + "Late"];
 
 export function validSchedule(s) {
@@ -81,7 +72,6 @@ export function validSchedule(s) {
   return null;
 }
 
-/** CSV cell with quote escaping + spreadsheet-formula neutralising. */
 export function csvCell(v) {
   let s = String(v ?? "");
   if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
@@ -91,13 +81,6 @@ export function csvCell(v) {
 const bySectionName = (a, b) => (a.section || "").localeCompare(b.section || "") || (a.name || "").localeCompare(b.name || "");
 const attended = (st) => st.state === "present" || st.state === "late";
 
-/**
- * State of each of the 4 scans for one student on one day.
- *   present = recorded (green)   late = recorded after the on-time limit (orange, IN scans only)
- *   absent  = window has closed and nothing was recorded (red)
- *   pending = window not finished yet today (grey)      none = not applicable (future day / deleted student)
- * A missed OUT scan is red even if the student scanned IN later (e.g. no Morning OUT but Afternoon IN done).
- */
 export function slotStates({ rec, date, today, nowMin, schedule, removed }) {
   const out = {};
   for (const slot of SLOTS) {
@@ -110,12 +93,6 @@ export function slotStates({ rec, date, today, nowMin, schedule, removed }) {
   return out;
 }
 
-/**
- * students: [{studentId,name,section,status,registeredDate}]
- * records:  [{studentId,name,section,date,slots:{amIn:{time,late},...}}]  (one per student per day)
- * Single day -> per student the 4 scan states.  Date range -> per-student totals.
- * "School days" = dates that have at least one record.
- */
 export function computeReport({ students, records, from, to, today, nowMin = 0, schedule = DEFAULT_SCHEDULE, section }) {
   const byStudent = new Map();                         // studentId -> Map(date -> record)
   for (const r of records) {
@@ -129,7 +106,7 @@ export function computeReport({ students, records, from, to, today, nowMin = 0, 
   for (const s of students) {
     if (include(s) && (s.status === "Active" || byStudent.has(s.studentId))) people.push(s);
   }
-  for (const [id, days] of byStudent) {                // students deleted after they were scanned
+  for (const [id, days] of byStudent) {               
     if (!known.has(id)) {
       const r = [...days.values()][0];
       const s = { studentId: id, name: r.name, section: r.section, status: "Removed", registeredDate: "" };
